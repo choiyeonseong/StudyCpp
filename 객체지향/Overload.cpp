@@ -1,11 +1,12 @@
-#include<stdio.h>
-
 /*
-	함수 오버로딩
+	함수 오버로딩(overloading)
 	중복 정의
 */
 
-int Add(int a, int b);
+#include<stdio.h>
+
+int Add(int a, int b);	// 일반 변수
+int Add(const int a, const int b);	// 상수 -> 형태가 달라서 오버로딩 가능
 int Add(int a, int b, int c);
 double Add(double a, double b);
 
