@@ -39,6 +39,6 @@ void printHuman(Human who)
 int main()
 {
 	Human kang("강감찬", 1424);
-	Human boy = kang;
+	Human boy = kang;	// 복사 생성자 호출
 	printHuman(boy);
 }
