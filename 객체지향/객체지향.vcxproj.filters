@@ -20,7 +20,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="operator2.cpp">
+    <ClCompile Include="ch6\Override.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
