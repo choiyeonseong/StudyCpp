@@ -143,7 +143,7 @@
     <ClInclude Include="..\include\cursor.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ch6\Override.cpp" />
+    <ClCompile Include="ch7\Overridable.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

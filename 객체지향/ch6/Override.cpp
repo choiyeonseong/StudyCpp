@@ -42,5 +42,5 @@ int main()
 	kim.intro();
 	Student han("김한결", 15, 123456);
 	han.intro();	// 함수이름이 중복이면 지역이 우선, 부모의 함수는 숨겨지고 학생객체에 대한 함수 호출
-	han.Human::intro();	// 숨겨진 부모 클래스의 intro 함수를 출력
+	han.Human::intro();	// 범위 지정 연산자를 이용해서 숨겨진 부모 클래스의 intro 함수를 출력
 }
