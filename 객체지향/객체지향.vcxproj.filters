@@ -20,7 +20,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ch7\Overridable.cpp">
+    <ClCompile Include="ch8\NonTypeArgument.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
