@@ -20,7 +20,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ch8\NonTypeArgument.cpp">
+    <ClCompile Include="ch9\tryctor.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
