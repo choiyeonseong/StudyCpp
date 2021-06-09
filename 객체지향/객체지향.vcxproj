@@ -143,7 +143,8 @@
     <ClInclude Include="..\include\cursor.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ch9\tryctor.cpp" />
+    <ClCompile Include="ch10\MemFuncArgument.cpp" />
+    <ClCompile Include="ch10\MemPtrInherit.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

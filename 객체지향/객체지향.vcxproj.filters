@@ -20,7 +20,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ch9\tryctor.cpp">
+    <ClCompile Include="ch10\MemFuncArgument.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ch10\MemPtrInherit.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
