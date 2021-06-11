@@ -23,5 +23,8 @@
     <ClCompile Include="ch12\Test_vector2.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="GoStop.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
