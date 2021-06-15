@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
@@ -324,10 +325,10 @@ void main()
 	Initialize();	// 데크에 카드를 섞고 패를 골고루 나누어 게임판 생성
 	for (SouthTurn = true; !Deck.IsEmpty(); SouthTurn = !SouthTurn) {	// 남군 차례부터 시작; 데크가 빌때까지 진행;카드 하나 낼때마다 한번 반복
 		DrawScreen();	// 각 객체를 화면에 그린다.
-		// 차례에 따라 대상 패를 미리 조사해 놓는다.
+		// 차례에 따라 대상 패를 미리 조사해 놓는다 -> 차례에 상관없이 코드를 일반화하는 기법
 		if (SouthTurn) {
-			Turn = &South;
-			TurnPae = &SouthPae;	
+			Turn = &South;			// 지금 차례인 플레이어
+			TurnPae = &SouthPae;	// 먹은 카드가 이동할 곳
 			OtherPae = &NorthPae;
 		}
 		else {
@@ -336,10 +337,11 @@ void main()
 			OtherPae = &SouthPae;
 		}
 
-		sprintf(Mes, "내고 싶은 화투를 선택하세요(1~%d,0:종료) ", Turn->GetNum());
+		// 플레이어가 가진 카드 개수만큼 숫자 입력
+		sprintf(Mes, "내고 싶은 화투를 선택하세요(1~%d,0:종료) ", Turn->GetNum());	
 		ch = InputInt(Mes, 0, Turn->GetNum());
 		if (ch == 0) {
-			if (InputInt("정말 끝낼겁니까?(0:예,1:아니오)", 0, 1) == 0)	// 점수 낸 사람이 stop하면 종료
+			if (InputInt("정말 끝낼겁니까?(0:예,1:아니오)", 0, 1) == 0)	// 0을 입력하면 종료
 				return;
 			else
 				continue;
@@ -348,62 +350,65 @@ void main()
 		// 플레이어가 카드를 한장 낸다.
 		UserTriple = DeckTriple = false;
 		UserIdx = ch - 1;
-		UserCard = Turn->GetCard(UserIdx);
-		SameNum = Blanket.FindSameCard(UserCard, arSame);
-		switch (SameNum) {
-		case 0:
-			UserSel = -1;
-			Blanket.InsertCard(Turn->RemoveCard(UserIdx));
+		UserCard = Turn->GetCard(UserIdx);	// 플레이어가 낸 카드
+		SameNum = Blanket.FindSameCard(UserCard, arSame);	// 플레이어가 낸 카드와 담요에 깔린 카드의 일치개수
+		switch (SameNum) {	// 일치하는 개수별로 분기
+		case 0:	// 일치하는 카드가 없는 경우
+			UserSel = -1;	// 아무것도 못먹음
+			Blanket.InsertCard(Turn->RemoveCard(UserIdx));	// 데크에서 뒤집은 카드와 일치할수 있으므로 버린 카드는 즉시 담요에 삽입
 			DrawScreen();
 			break;
-		case 1:
-			UserSel = arSame[0];
+		case 1:	// 하나만 일치하는 경우
+			UserSel = arSame[0];	// 사용자가 선택한 카드 : UserSel
 			break;
-		case 2:
-			if (Blanket.GetCard(arSame[0]) == Blanket.GetCard(arSame[1])) {
+		case 2:	// 두개가 일치하는 경우
+			if (Blanket.GetCard(arSame[0]) == Blanket.GetCard(arSame[1])) {	// 두카드가 같은때는 질문하지 않는다
 				UserSel = arSame[0];
 			}
 			else {
-				Blanket.DrawSelNum(arSame);
-				sprintf(Mes, "어떤 카드를 선택하시겠습니까?(1~%d)", SameNum);
-				UserSel = arSame[InputInt(Mes, 1, SameNum) - 1];
+				Blanket.DrawSelNum(arSame);	// 일치하는 카드 목록을 arSame에 담아 담요의 DrawSelNum을 호출하여 번호를 출력하고 
+				sprintf(Mes, "어떤 카드를 선택하시겠습니까?(1~%d)", SameNum);	
+				UserSel = arSame[InputInt(Mes, 1, SameNum) - 1];	// 사용자의 키 입력을 받아 선택된 카드를 UserSel에 대입
 			}
 			break;
-		case 3:
-			UserSel = arSame[1];
-			UserTriple = true;
+		case 3:	// 세개가 일치하는 경우
+			UserSel = arSame[1];	// 가운데 카드에 맞춰두고 가져올때는 양옆의 카드 두장까지 한꺼번에 가져옴
+			UserTriple = true;		// 세장을 먹었음을 표시
 			break;
 		}
+
 		if (UserSel != -1) {
-			Blanket.DrawTempCard(UserSel, UserCard);
+			Blanket.DrawTempCard(UserSel, UserCard); // 플레이어가 낸카드를 카드아래쪽에 표시하고 먹을것임을 표시
 		}
-		delay(Speed);
+
+		delay(Speed);	// 상황을 보여주기위해 1초간 딜레이
 
 		// 데크에서 한장을 뒤집는다.
 		Deck.Draw(true);
-		delay(Speed);
-		DeckCard = Deck.Pop();
-		SameNum = Blanket.FindSameCard(DeckCard, arSame);
+		delay(Speed);	// 뒤집은 카드를 보여주기위해 딜레이
+		DeckCard = Deck.Pop();	// 데크 제일 위에 있는 카드를 꺼내 대입
+		SameNum = Blanket.FindSameCard(DeckCard, arSame);	// 데크에서 뒤집은 카드와 담요의 카드가 일치하는 개수에 따라 진행이 결정
+		
 		switch (SameNum) {
-		case 0:
-			DeckSel = -1;
+		case 0:	// 일치하는 카드가 없는 경우
+			DeckSel = -1;	// 먹을게 없음을 표시
 			break;
-		case 1:
-			DeckSel = arSame[0];
-			if (DeckSel == UserSel) {
-				if (Deck.IsNotLast()) {
-					Blanket.InsertCard(DeckCard);
-					Blanket.InsertCard(Turn->RemoveCard(UserIdx));
+		case 1:	// 하나만 일치하는 경우
+			DeckSel = arSame[0];	// DeckSel에 일치한 카드 첨자를 대입
+			if (DeckSel == UserSel) {	// 사용자가 낸 카드와 데크의 카드가 일치하면 -> 설사
+				if (Deck.IsNotLast()) {	// 마지막판이 아닌 경우
+					Blanket.InsertCard(DeckCard);	// 모든 카드를 담요로 반납, 데크 카드
+					Blanket.InsertCard(Turn->RemoveCard(UserIdx));	// 모든 카드를 담요로 반납, 사용자가 낸 카드
 					OutPrompt("설사했습니다.", PromptSpeed);
-					continue;
+					continue;	// 아무것도 먹지 못함
 				}
-				else {
-					DeckSel = -1;
+				else {	
+					DeckSel = -1;	// 마지막판에는 설사가 없으니 사용자가 낸 카드를 무사히 가져가도록 한다.
 				}
 			}
 			break;
-		case 2:
-			if (UserSel == arSame[0]) {
+		case 2:	// 두개가 일치하는 경우
+			if (UserSel == arSame[0]) {	// 플레이어가 찜해놓은 카드를 취한다. -> 따닥
 				DeckSel = arSame[1];
 			}
 			else if (UserSel == arSame[1]) {
@@ -420,20 +425,21 @@ void main()
 				}
 			}
 			break;
-		case 3:
+		case 3:	// 세개가 일치하는 경우
 			DeckSel = arSame[1];
-			DeckTriple = true;
+			DeckTriple = true;	// 모든 카드를 다 가져온다
 			break;
 		}
-		if (DeckSel != -1) {
+
+		if (DeckSel != -1) {	// 뒤집은 카드를 DeckSel 자리에 표시
 			Blanket.DrawTempCard(DeckSel, DeckCard);
 		}
 		Deck.Draw(false);
 		delay(Speed);
 
 		// 일치하는 카드를 거둬 들인다. 세 장을 먹은 경우는 전부 가져 온다.
-		if (UserSel != -1) {
-			if (UserTriple) {
+		if (UserSel != -1) {	// 담요의 카드를 먹은 패로 이동
+			if (UserTriple) {	// 담요에서 3장을 가져온다
 				for (i = 0; i < 3; i++) {
 					TurnPae->InsertCard(Blanket.RemoveCard(UserSel - 1));
 				}
@@ -446,6 +452,7 @@ void main()
 				DeckSel -= (UserTriple ? 3 : 1);
 			}
 		}
+		
 		if (DeckSel != -1) {
 			if (DeckTriple) {
 				for (i = 0; i < 3; i++) {
@@ -457,43 +464,48 @@ void main()
 			}
 			TurnPae->InsertCard(DeckCard);
 		}
-		else {
+		else {	// DeckSel이 -1일때 담요로 이동한다.
 			Blanket.InsertCard(DeckCard);
 		}
 
 		// 쪽, 따닥, 싹쓸이 조건을 점검하고 상대방의 피를 뺏는다.
-		nSnatch = 0;
+		nSnatch = 0;	// 뺏어올 카드 숫자
 		if (Deck.IsNotLast()) {
-			if (UserSel == -1 && SameNum == 1 && DeckCard.GetNumber() == UserCard.GetNumber()) {
+			// 쪽 : 내가낸 카드를 데크에서 뒤집어 다시 먹는 경우
+			if (UserSel == -1 && SameNum == 1 && DeckCard.GetNumber() == UserCard.GetNumber()) {	
 				nSnatch++;
 				OutPrompt("쪽입니다.", PromptSpeed);
 			}
+			// 따닥 : 플레이어가 낸 카드로 담요의 카드를 먹고 데크에서 뒤집은 카드로도 먹되 네장의 숫자가 모두 일치할때
 			if (UserSel != -1 && SameNum == 2 && DeckCard.GetNumber() == UserCard.GetNumber()) {
 				nSnatch++;
 				OutPrompt("따닥입니다.", PromptSpeed);
 			}
+			// 싹쓸이 : 담요에 남은 카드가 하나도 없을 때
 			if (Blanket.GetNum() == 0) {
 				nSnatch++;
 				OutPrompt("싹쓸이입니다.", PromptSpeed);
 			}
+			// 한번에 세장을 먹는 경우
 			if (UserTriple || DeckTriple) {
 				OutPrompt("한꺼번에 세 장을 먹었습니다.", PromptSpeed);
 				nSnatch += UserTriple + DeckTriple;
 			}
 		}
+		// nSnatch의 최대값은 3
 		for (i = 0; i < nSnatch; i++) {
 			TurnPae->InsertCard(OtherPae->RemovePee());
 		}
 
 		// 점수를 계산하고 고, 스톱 여부를 질문한다.
 		NewScore = TurnPae->CalcScore();
-		if (Deck.IsNotLast() && NewScore > TurnPae->OldScore) {
+		if (Deck.IsNotLast() && NewScore > TurnPae->OldScore) {	// 새점수가 OldScore보다 커졌다면 go/stop
 			DrawScreen();
 			if (InputInt("추가 점수를 획득했습니다.(0:스톱, 1:계속)", 0, 1) == 1) {
-				TurnPae->OldScore = NewScore;
-				TurnPae->IncreaseGo();
+				TurnPae->OldScore = NewScore;	// 점수 갱신
+				TurnPae->IncreaseGo();			// 고 횟수 증가
 			}
-			else {
+			else {	// 막판에는 무조건 스톱
 				break;
 			}
 		}
@@ -546,9 +558,9 @@ int InputInt(const char* Mes, int start, int end)
 
 	OutPrompt(Mes);
 	for (;;) {
-		ch = tolower(getch());
+		ch = tolower(_getch());
 		if (ch == 0xE0 || ch == 0) {	
-			ch = getch();
+			ch = _getch();
 			continue;
 		}
 		if (!(isdigit(ch) || ch == 'a')) continue;
